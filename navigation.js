@@ -1,0 +1,63 @@
+// Merkezi bölüm navigasyonu — tüm roman bölümleri bu tek sistemden yönetilir.
+const CHAPTERS = [
+  [1, 'Uyanış', 'bolum-1.html'],
+  [2, 'Yol', 'bolum-2.html'],
+  [3, 'İlk Şehir', 'bolum-3.html'],
+  [4, 'Demirci', 'bolum-4.html'],
+  [5, 'İlk Gün', 'bolum-5.html'],
+  [6, 'Şehrin İçinde', 'bolum-6.html'],
+  [7, 'Yolun Ötesi', 'bolum-7.html'],
+  [8, 'İsimsiz', 'bolum-8.html'],
+  [9, 'İz', 'bolum-9.html'],
+  [10, 'Bölüm 10', 'bolum-10.html'],
+  [11, 'Bölüm 11', 'bolum-11.html'],
+  [12, 'Bölüm 12', 'bolum-12.html'],
+  [13, 'Bölüm 13', 'bolum-13.html'],
+  [14, 'Bölüm 14', 'bolum-14.html'],
+  [15, 'Bölüm 15', 'bolum-15.html'],
+  [16, 'Bölüm 16', 'bolum-16.html'],
+  [17, 'Bölüm 17', 'bolum-17.html'],
+  [18, 'Bölüm 18', 'bolum-18.html'],
+  [19, 'Bölüm 19', 'bolum-19.html'],
+  [20, 'Bölüm 20', 'bolum-20.html'],
+  [21, 'Bölüm 21', 'bolum-21.html'],
+  [22, 'Bölüm 22', 'bolum-22.html'],
+  [23, 'Bölüm 23', 'bolum-23.html'],
+  [24, 'Bölüm 24', 'bolum-24.html'],
+  [25, 'Kılavuz', 'bolum-25.html']
+];
+
+function getCurrentChapter() {
+  const match = location.pathname.match(/bolum-(\d+)\.html/i);
+  return match ? Number(match[1]) : null;
+}
+
+function renderChapterNavigation() {
+  const nav = document.querySelector('.nav');
+  const current = getCurrentChapter();
+  if (!nav || !current) return;
+
+  const index = CHAPTERS.findIndex(ch => ch[0] === current);
+  if (index < 0) return;
+
+  const previous = CHAPTERS[index - 1];
+  const next = CHAPTERS[index + 1];
+
+  nav.innerHTML = '';
+
+  if (previous) {
+    nav.insertAdjacentHTML('beforeend', `<a href="${previous[2]}"><small>ÖNCEKİ BÖLÜM</small>Bölüm ${String(previous[0]).padStart(2,'0')} — ${previous[1]}</a>`);
+  } else {
+    nav.insertAdjacentHTML('beforeend', '<span class="nav-placeholder"></span>');
+  }
+
+  nav.insertAdjacentHTML('beforeend', '<a href="index.html#chapters"><small>BÖLÜM LİSTESİ</small>Bölümler</a>');
+
+  if (next) {
+    nav.insertAdjacentHTML('beforeend', `<a class="next" href="${next[2]}"><small>SONRAKİ BÖLÜM</small>Bölüm ${String(next[0]).padStart(2,'0')} — ${next[1]}</a>`);
+  } else {
+    nav.insertAdjacentHTML('beforeend', '<span class="nav-placeholder"></span>');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderChapterNavigation);
