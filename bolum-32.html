@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bölüm 32 — Yedi General | Kızıl Ölümün Bekçisi</title>
 </head>
-<body>
+<body><div class="layout"><aside class="sidebar"><div class="brand"><div class="sigil">✦</div><h1>KIZIL<br>ÖLÜMÜN<br>BEKÇİSİ</h1><div class="author"><span class="author-label">Yazar</span>Şahin Kadak</div></div><nav class="menu"><a href="index.html">⌂ &nbsp; ANA SAYFA</a><a class="active" href="index.html#chapters">▢ &nbsp; BÖLÜMLER</a><a href="index.html#about">◎ &nbsp; DÜNYA</a><a href="index.html#about">♙ &nbsp; KARAKTERLER</a><a href="index.html#about">ⓘ &nbsp; HAKKINDA</a></nav><div class="social">◎　𝕏　✉</div></aside><main class="main">
 <main>
 <h1>Bölüm 32 — Yedi General</h1>
 
@@ -538,5 +538,40 @@
 <a href="index.html#chapters">Bölümler</a>
 </nav>
 </main>
-</body>
+</main></div><script>
+(function(){
+  const article=document.querySelector('article');
+  if(!article) return;
+  const ps=[...article.querySelectorAll('p.dialogue')];
+  // Convert the chapter-27 dash-only dialogue into the same named-speaker format as the first 25 chapters.
+  if(location.pathname.includes('bolum-27')){
+    let speaker='Aras';
+    ps.forEach(p=>{
+      if(/^\s*[—-]/.test(p.textContent)){
+        const text=p.textContent.trim().replace(/^[—-]\s*/,'');
+        p.innerHTML='<span class="speaker">'+speaker+':</span><span class="speech">— '+text+'</span>';
+        speaker=speaker==='Aras'?'Kılavuz':'Aras';
+      }
+    });
+  }
+  // Convert separate speaker/speech paragraphs used by some Cilt II files.
+  for(let i=0;i<ps.length-1;i++){
+    const a=ps[i], b=ps[i+1];
+    if(a===b) continue;
+    const at=a.textContent.trim();
+    const bt=b.textContent.trim();
+    if(/^[^—:]{1,40}:$/.test(at) && /^—/.test(bt)){
+      const speaker=at.slice(0,-1).trim();
+      a.innerHTML='<span class="speaker">'+speaker+':</span><span class="speech">'+bt+'</span>';
+      a.className='dialogue';
+      b.remove();
+    }
+  }
+  // Normalize inline speaker spans already present.
+  article.querySelectorAll('.dialogue').forEach(d=>{
+    const sp=d.querySelector('.speaker');
+    if(sp) sp.textContent=sp.textContent.replace(/\s*$/,'');
+  });
+})();
+</script></body>
 </html>
