@@ -1,0 +1,28 @@
+name: Normalize Cilt II chapters
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/normalize-cilt2.yml'
+      - '.normalize_cilt2.py'
+      - 'NORMALIZE_CILT2'
+permissions:
+  contents: write
+jobs:
+  normalize:
+    if: contains(github.event.head_commit.message, '[normalize-c2]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Normalize chapters 26-32 to Cilt I reader style
+        run: python .normalize_cilt2.py
+      - name: Commit normalized chapters
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bolum-26.html bolum-27.html bolum-28.html bolum-29.html bolum-30.html bolum-31.html bolum-32.html
+          git diff --cached --quiet || git commit -m 'Normalize Cilt II reader style'
+          git push
