@@ -16,23 +16,37 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
+
+          # Ana sayfa marka düzeni
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
           replacements = {
               '<title>Kızıl Ölümün Bekçisi</title>': '<title>KızılÖlüm</title>',
               'KIZIL<br>ÖLÜMÜN<br>BEKÇİSİ': 'KIZILÖLÜM',
-              '<div class="kicker">Bir Hikâye</div><h2><span>KIZIL</span><span>ÖLÜMÜN</span><span>BEKÇİSİ</span></h2>': '<div class="kicker">Kızıl Ölümün Bekçisi Evreni</div><h2>KızılÖlüm</h2>',
-              'Kızıl Ölümün Bekçisi — karanlık fantastik bir web romanı.': 'KızılÖlüm — Kızıl Ölümün Bekçisi Evreni.',
-              'Kızıl Ölümün Bekçisi — Şahin Kadak tarafından yazılan karanlık fantastik web romanı.': 'KızılÖlüm — Kızıl Ölümün Bekçisi Evreni; Şahin Kadak tarafından yazılan karanlık fantastik web romanı.'
+              '<div class="kicker">Bir Hikâye</div><h2><span>KIZIL</span><span>ÖLÜMÜN</span><span>BEKÇİSİ</span></h2>': '<div class="kicker">Kızıl Ölümün Bekçisi</div><h2>KızılÖlüm</h2>',
+              'Kızıl Ölümün Bekçisi — karanlık fantastik bir web romanı.': 'KızılÖlüm — Kızıl Ölümün Bekçisi.',
+              'Kızıl Ölümün Bekçisi — Şahin Kadak tarafından yazılan karanlık fantastik web romanı.': 'KızılÖlüm — Şahin Kadak tarafından yazılan karanlık fantastik web romanı.'
           }
           for old, new in replacements.items():
               s = s.replace(old, new)
           p.write_text(s, encoding='utf-8')
+
+          # Bölüm sayfalarındaki sol marka alanını tek sisteme getir.
+          for p in sorted(Path('.').glob('bolum-*.html')):
+              s = p.read_text(encoding='utf-8')
+              original = s
+              s = re.sub(r'(<div class="brand">.*?<h1>).*?(</h1>)', r'\1KızılÖlüm\2', s, count=1, flags=re.S)
+              s = re.sub(r'(<a class="reading-brand"[^>]*>).*?(</a>)', r'\1KızılÖlüm\2', s, count=1, flags=re.S)
+              # Eski çok satırlı marka kalmışsa onu da temizle.
+              s = s.replace('KIZIL<br>ÖLÜMÜN<br>BEKÇİSİ', 'KızılÖlüm')
+              if s != original:
+                  p.write_text(s, encoding='utf-8')
           PY
       - name: Commit brand update
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html
-          git diff --cached --quiet || git commit -m 'Set site brand to KızılÖlüm'
+          git add index.html bolum-*.html
+          git diff --cached --quiet || git commit -m 'Unify KızılÖlüm chapter branding'
           git push
